@@ -1,13 +1,28 @@
 import { nanoid } from 'nanoid';
 import { Form, Label, Input, Button } from './ContactsForm.styled';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectContactsArray } from 'redux/selectors';
+import { addContact } from 'redux/operations';
 
-export function ContactsForm({handleSubmit}) {
+export function ContactsForm() {
   const nameInputId = nanoid();
   const phoneInputId = nanoid();
+  const contacts = useSelector(selectContactsArray);
+  const dispatch = useDispatch();
+
+  const handleContactAdd = evt => {
+    const { name, phone } = evt.target;
+    evt.preventDefault();
+    if (contacts.some(item => item.name === name.value)) {
+      alert(`${name.value} is already in contacts.`);
+    } else {
+      dispatch(addContact({ name: name.value, phone: phone.value }));
+    }
+    evt.target.reset();
+  };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleContactAdd}>
       <Label htmlFor={nameInputId}>Name</Label>
       <Input
         id={nameInputId}
@@ -21,7 +36,7 @@ export function ContactsForm({handleSubmit}) {
       <Input
         id={phoneInputId}
         type="tel"
-        name="number"
+        name="phone"
         pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
         title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
         required
@@ -30,7 +45,3 @@ export function ContactsForm({handleSubmit}) {
     </Form>
   );
 }
-
-ContactsForm.propTypes = {
-  handleSubmit: PropTypes.func.isRequired,
-};

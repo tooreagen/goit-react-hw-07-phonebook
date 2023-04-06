@@ -1,52 +1,38 @@
-import { nanoid } from 'nanoid';
 import { ContactsForm } from './ContactsForm/ContactsForm';
 import { ContactsList } from './ContactsList/ContactsList';
 import { Filter } from './Filter/Filter';
 import { Layout } from './Layout';
 import { GlobalStyle } from './GlobalStyle';
-import { addContact, deleteContact } from 'redux/contactsSlice';
-import { filterContacts } from 'redux/filterSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { getContactsArray, getFilterString } from 'redux/selectors';
+import { useEffect } from 'react';
+import { fetchContacts } from 'redux/operations';
+import { selectFetchError, selectIsLoadingState } from 'redux/selectors';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Loading } from './Loading/Loading';
 
 export function App() {
-  const contacts = useSelector(getContactsArray);
-  const filter = useSelector(getFilterString);
   const dispatch = useDispatch();
+  const error = useSelector(selectFetchError);
+  const isLoading = useSelector(selectIsLoadingState);
 
-  const contactAdd = evt => {
-    const { name, number } = evt.target;
-    evt.preventDefault();
-    if (contacts.some(item => item.name === name.value)) {
-      alert(`${name.value} is already in contacts.`);
-    } else {
-      const id = nanoid();
-      dispatch(addContact({ id: id, name: name.value, number: number.value }));
-    }
-  };
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
-  const contactDelete = id => {
-    dispatch(deleteContact(id));
-  };
-
-  const contactFind = evt => {
-    dispatch(filterContacts(evt.currentTarget.value));
-  };
+  useEffect(() => {
+    toast.error(error);
+  }, [error]);
 
   return (
     <Layout>
       <h1>Phonebook</h1>
-      <ContactsForm handleSubmit={contactAdd} />
-
+      <ContactsForm />
       <h2>Contacts</h2>
-      <Filter handleFind={contactFind} />
-        <ContactsList
-          contacts={contacts}
-          filterString={filter}
-          onDelete={contactDelete}
-        />
-
+      <Filter />
+      {isLoading ? <Loading /> : <ContactsList />}
       <GlobalStyle />
+      <ToastContainer />
     </Layout>
   );
 }
