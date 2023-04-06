@@ -11,6 +11,6 @@ export const P = styled.p`
 
 export const Input = styled.input`
     padding: 8px;
-    width: 30%;
+    width: 100%;
     border-radius: 5px;
 `;
