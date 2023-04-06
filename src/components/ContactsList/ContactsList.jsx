@@ -1,6 +1,5 @@
 import { ContactsListItem } from 'components/ContactsListItem/ContactsListItem';
 import { List } from './ContactsList.styled';
-import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { selectContactsArray, selectFilterString } from 'redux/selectors';
 
@@ -18,7 +17,3 @@ export function ContactsList() {
     </List>
   );
 }
-
-ContactsList.propTypes = {
-  filterString: PropTypes.string,
-};
